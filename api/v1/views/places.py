@@ -24,7 +24,8 @@ def get_places(city_id):
     return jsonify(places_list)
 
 
-@app_views.route('/places', methods=['POST'], strict_slashes=False)
+@app_views.route('/cities/<city_id>/places', methods=['POST'],
+                 strict_slashes=False)
 def post_place():
     """create a place"""
     try:
