@@ -21,7 +21,7 @@ def post_amenity():
     """create an amenity"""
     try:
         data = request.get_json()
-    except:
+    except Exception as e:
         abort(400, 'Not a JSON')
     if 'name' not in data:
         abort(400, 'Missing name')
@@ -62,7 +62,7 @@ def put_amenity(amenity_id):
         abort(404)
     try:
         data = request.get_json()
-    except:
+    except Exception as e:
         abort(400, 'Not a JSON')
     for key, value in data.items():
         if key not in ['id', 'created_at', 'updated_at']:

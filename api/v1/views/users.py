@@ -21,7 +21,7 @@ def post_user():
     """create a user"""
     try:
         data = request.get_json()
-    except:
+    except Exception as e:
         abort(400, 'Not a JSON')
     if 'email' not in data:
         abort(400, 'Missing email')
@@ -61,7 +61,7 @@ def put_user(user_id):
         abort(404)
     try:
         data = request.get_json()
-    except:
+    except Exception as e:
         abort(400, 'Not a JSON')
     for key, value in data.items():
         if key not in ['id', 'email', 'created_at', 'updated_at']:

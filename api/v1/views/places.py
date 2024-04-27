@@ -29,7 +29,7 @@ def post_place():
     """create a place"""
     try:
         data = request.get_json()
-    except:
+    except Exception as e:
         abort(400, 'Not a JSON')
     if 'user_id' not in data:
         abort(400, 'Missing user_id')
@@ -75,7 +75,7 @@ def put_place(place_id):
         abort(404)
     try:
         data = request.get_json()
-    except:
+    except Exception as e:
         abort(400, 'Not a JSON')
     for key, value in data.items():
         if key not in ['id', 'user_id', 'city_id', 'created_at', 'updated_at']:
@@ -87,8 +87,9 @@ def put_place(place_id):
 @app_views.route('/places_search', methods=['POST'], strict_slashes=False)
 def search_places():
     """search for places"""
-    data = request.get_json()
-    if data is None:
+    try:
+        data = request.get_json()
+    except Exception as e:
         abort(400, 'Not a JSON')
     places = storage.all(Place).values()
     places_list = []
