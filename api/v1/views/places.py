@@ -27,27 +27,27 @@ def get_places(city_id):
 @app_views.route('/cities/<city_id>/places', methods=['POST'],
                  strict_slashes=False)
 def post_place():
-    """create a place"""
-    try:
-        data = request.get_json()
-    except Exception as e:
-        abort(400, 'Not a JSON')
-    if 'city_id' not in data:
-        abort(400, 'Missing city_id')
-    city = storage.get(City, data['city_id'])
-    if city is None:
+    request_body = request.get_json(silent=True)
+    city_obj = storage.get(City, city_id)
+
+    if city_obj is None:
         abort(404)
-    if 'user_id' not in data:
-        abort(400, 'Missing user_id')
-    user = storage.get(User, data['user_id'])
+    elif not request_body:
+        abort(400, "Not a JSON")
+    elif "name" not in request_body:
+        abort(400, "Missing name")
+    elif "user_id" not in request_body:
+        abort(400, "Missing user_id")
+
+    user = storage.get(User, request_body["user_id"])
     if user is None:
         abort(404)
-    if 'name' not in data:
-        abort(400, 'Missing name')
-    place = Place(**data)
-    storage.new(place)
-    storage.save()
-    return jsonify(place.to_dict()), 201
+
+    request_body["city_id"] = city_id
+    new_place = Place(**request_body)
+    new_place.save()
+
+    return jsonify(new_place.to_dict()), 201
 
 
 @app_views.route('/places/<place_id>', methods=['GET'],
