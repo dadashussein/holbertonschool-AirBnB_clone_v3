@@ -47,21 +47,17 @@ def delete_city(city_id):
 def post_city(state_id):
     """create a city"""
     state = storage.get(State, state_id)
+    data = request.get_json(silent=True)
     if state is None:
         abort(404)
-    try:
-        data = request.get_json()
-    except FileExistsError:
+    if not data:
         abort(400, 'Not a JSON')
-    if data is None:
-        abort(400, 'Not a JSON')
-    if 'name' not in data:
+    elif 'name' not in data:
         abort(400, 'Missing name')
     data['state_id'] = state_id
-    city = City(**data)
-    storage.new(city)
-    storage.save()
-    return jsonify(city.to_dict()), 201
+    new_city = City(**data)
+    new_city.save()
+    return jsonify(new_city.to_dict()), 201
 
 
 @app_views.route('/cities/<city_id>', methods=['PUT'], strict_slashes=False)
@@ -70,10 +66,7 @@ def put_city(city_id):
     city = storage.get(City, city_id)
     if city is None:
         abort(404)
-    try:
-        data = request.get_json()
-    except FileExistsError:
-        abort(400, 'Not a JSON')
+    data = request.get_json(silent=True)
     if data is None:
         abort(400, 'Not a JSON')
     for key, value in data.items():

@@ -20,7 +20,7 @@ def get_states():
 @app_views.route('/states', methods=['POST'], strict_slashes=False)
 def post_state():
     """create a state"""
-    data = request.get_json()
+    data = request.get_json(silent=True)
     if not data:
         abort(400, 'Not a JSON')
     elif 'name' not in data:
@@ -55,7 +55,7 @@ def delete_state(state_id):
 def put_state(state_id):
     """update a state"""
     state = storage.get(State, state_id)
-    data = request.get_json()
+    data = request.get_json(silent=True)
     if not data:
         abort(400)
     elif not data:
