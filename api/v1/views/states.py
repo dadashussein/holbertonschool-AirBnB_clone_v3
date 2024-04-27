@@ -56,10 +56,11 @@ def put_state(state_id):
     """update a state"""
     state = storage.get(State, state_id)
     data = request.get_json(silent=True)
-    if not data:
-        abort(400)
+    if not state:
+        abort(404)
     elif not data:
         abort(400, "Not a JSON")
+
     for key, value in data.items():
         if key not in ['id', 'created_at', 'updated_at']:
             setattr(state, key, value)
