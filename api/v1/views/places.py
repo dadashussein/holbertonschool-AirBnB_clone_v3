@@ -31,13 +31,18 @@ def post_place():
         data = request.get_json()
     except Exception as e:
         abort(400, 'Not a JSON')
+    if 'city_id' not in data:
+        abort(400, 'Missing city_id')
+    city = storage.get(City, data['city_id'])
+    if city is None:
+        abort(404)
     if 'user_id' not in data:
         abort(400, 'Missing user_id')
-    if 'name' not in data:
-        abort(400, 'Missing name')
     user = storage.get(User, data['user_id'])
     if user is None:
         abort(404)
+    if 'name' not in data:
+        abort(400, 'Missing name')
     place = Place(**data)
     storage.new(place)
     storage.save()
