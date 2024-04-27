@@ -22,7 +22,7 @@ def post_state():
     """create a state"""
     try:
         data = request.get_json()
-    except:
+    except FileExistsError:
         abort(400, 'Not a JSON')
     if data is None:
         abort(400, 'Not a JSON')
@@ -63,7 +63,7 @@ def put_state(state_id):
         abort(404)
     try:
         data = request.get_json()
-    except:
+    except FileExistsError:
         abort(400, 'Not a JSON')
     if data is None:
         abort(400, 'Not a JSON')

@@ -49,7 +49,10 @@ def post_city(state_id):
     state = storage.get(State, state_id)
     if state is None:
         abort(404)
-    data = request.get_json()
+    try:
+        data = request.get_json()
+    except FileExistsError:
+        abort(400, 'Not a JSON')
     if data is None:
         abort(400, 'Not a JSON')
     if 'name' not in data:
@@ -67,7 +70,10 @@ def put_city(city_id):
     city = storage.get(City, city_id)
     if city is None:
         abort(404)
-    data = request.get_json()
+    try:
+        data = request.get_json()
+    except FileExistsError:
+        abort(400, 'Not a JSON')
     if data is None:
         abort(400, 'Not a JSON')
     for key, value in data.items():
