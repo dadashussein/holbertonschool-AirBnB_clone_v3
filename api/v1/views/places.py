@@ -88,21 +88,41 @@ def put_place(place_id):
     return jsonify(place.to_dict())
 
 
-@app_views.route('/places_search', methods=['POST'], strict_slashes=False)
-def search_places():
-    """search for places"""
-    try:
-        data = request.get_json()
-    except Exception as e:
-        abort(400, 'Not a JSON')
-    states = data.get('states', [])
-    cities = data.get('cities', [])
-    amenities = data.get('amenities', [])
-    places = storage.all(Place).values()
+@app_views.route("/places_search", strict_slashes=False, methods=["POST"])
+def post_place_search():
+    """Search for places"""
+    if request.get_json() is None:
+        return jsonify({"error": "Not a JSON"}), 400
+
+    states = request.get_json().get("states", [])
+    cities = request.get_json().get("cities", [])
+    amenities = request.get_json().get("amenities", [])
+
+    amenities_list = []
+    for amenity_id in amenities:
+        amenity = storage.get("Amenity", amenity_id)
+        if amenity:
+            amenities_list.append(amenity)
+
+    if states == cities == []:
+        places = storage.all("Place").values()
+    else:
+        places = []
+        for state_id in states:
+            state = storage.get("State", state_id)
+            for city in state.cities:
+                if city.id not in cities:
+                    cities.append(city.id)
+        for city_id in cities:
+            city = storage.get("City", city_id)
+            for place in city.places:
+                places.append(place)
+
     places_list = []
     for place in places:
-        if (not states or place.city.state_id in states) and \
-            (not cities or place.city_id in cities) and \
-           (not amenities or all(amenity.id in place.amenities for amenity in amenities)):
-            places_list.append(place.to_dict())
+        places_list.append(place.to_dict())
+        for amenity in amenities_list:
+            if amenity not in place.amenities:
+                places_list.pop()
+                break
     return jsonify(places_list)
