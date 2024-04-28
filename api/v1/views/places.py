@@ -95,9 +95,14 @@ def search_places():
         data = request.get_json()
     except Exception as e:
         abort(400, 'Not a JSON')
+    states = data.get('states', [])
+    cities = data.get('cities', [])
+    amenities = data.get('amenities', [])
     places = storage.all(Place).values()
     places_list = []
     for place in places:
-        if all([getattr(place, key) == value for key, value in data.items()]):
+        if (not states or place.city.state_id in states) and \
+            (not cities or place.city_id in cities) and \
+           (not amenities or all(amenity.id in place.amenities for amenity in amenities)):
             places_list.append(place.to_dict())
     return jsonify(places_list)
